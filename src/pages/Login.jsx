@@ -14,12 +14,19 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError('');
+    
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }
-    login(email, password);
-    navigate('/dashboard');
+
+    try {
+      login(email, password);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    }
   };
 
   return (
@@ -120,7 +127,7 @@ export default function Login() {
           {/* Demo Hint */}
           <div className="mt-4 bg-luxury-dark border border-luxury-border rounded-sm p-3 text-center">
             <p className="text-xs text-luxury-muted">
-              <span className="text-gold-400">Demo:</span> Use any email to login. Use "admin@" for admin access or "seller@" for seller access.
+              <span className="text-gold-400">Admin Login:</span> email: <span className="text-white">admin@luxe.com</span> | pass: <span className="text-white">admin</span>
             </p>
           </div>
         </div>

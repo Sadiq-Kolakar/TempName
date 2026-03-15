@@ -15,11 +15,26 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (email, password) => {
+    // Define Admin Credentials
+    const ADMIN_EMAIL = 'admin@luxe.com';
+    const ADMIN_PASSWORD = 'admin';
+
+    let role = 'buyer';
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      role = 'admin';
+    } else if (email.includes('seller')) {
+      role = 'seller';
+    }
+
+    if (email === ADMIN_EMAIL && password !== ADMIN_PASSWORD) {
+      throw new Error('Invalid Admin Password');
+    }
+
     const userData = {
       id: Date.now(),
       name: email.split('@')[0],
       email,
-      role: email.includes('admin') ? 'admin' : email.includes('seller') ? 'seller' : 'buyer',
+      role,
       phone: '+91 98765 43210',
       avatar: null,
       createdAt: new Date().toISOString(),
