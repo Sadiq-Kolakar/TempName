@@ -1,19 +1,26 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Car, Users, MessageSquare, TrendingUp, CheckCircle, XCircle, Eye, 
-  Search, Filter, MoreVertical, DollarSign 
+  Search, Filter, MoreVertical, DollarSign, Plus, Pencil, Trash2, X, Upload
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { cars, formatPrice } from '../data/cars';
+import { useCars } from '../context/CarContext';
+import { brands, formatPrice } from '../data/cars';
 
 export default function Admin() {
   const { user } = useAuth();
+  const { cars, addCar, updateCar, deleteCar, updateCarStatus } = useCars();
   const [tab, setTab] = useState('dashboard');
-  const [carStatuses, setCarStatuses] = useState(
-    Object.fromEntries(cars.map((c) => [c.id, c.status || 'approved']))
-  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCar, setEditingCar] = useState(null);
+  
+  const [form, setForm] = useState({
+    title: '', brand: '', model: '', year: '', price: '',
+    kmDriven: '', fuel: 'Petrol', transmission: 'Automatic', color: '',
+    description: '', images: [''],
+  });
 
   if (!user || user.role !== 'admin') {
     return <Navigate to="/login" />;
@@ -33,8 +40,30 @@ export default function Admin() {
     { id: 4, buyer: 'Meera R.', car: 'Mercedes-AMG G63', message: 'Available for viewing?', status: 'replied', date: '2d ago' },
   ];
 
-  const handleApprove = (carId) => setCarStatuses({ ...carStatuses, [carId]: 'approved' });
-  const handleReject = (carId) => setCarStatuses({ ...carStatuses, [carId]: 'rejected' });
+  const handleOpenModal = (car = null) => {
+    if (car) {
+      setEditingCar(car);
+      setForm({ ...car });
+    } else {
+      setEditingCar(null);
+      setForm({
+        title: '', brand: '', model: '', year: '', price: '',
+        kmDriven: '', fuel: 'Petrol', transmission: 'Automatic', color: '',
+        description: '', images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800'],
+      });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSaveCar = (e) => {
+    e.preventDefault();
+    if (editingCar) {
+      updateCar(editingCar.id, form);
+    } else {
+      addCar({ ...form, title: `${form.brand} ${form.model}` });
+    }
+    setIsModalOpen(false);
+  };
 
   const tabs = [
     { key: 'dashboard', label: 'Dashboard' },
@@ -53,9 +82,17 @@ export default function Admin() {
               <p className="section-subtitle mb-1">Administration</p>
               <h1 className="font-display text-2xl font-bold text-white">Admin Panel</h1>
             </div>
-            <div className="flex items-center gap-2 bg-gold-400/10 px-3 py-1.5 rounded-full">
-              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-              <span className="text-xs text-gold-400 font-medium">Admin Mode</span>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => handleOpenModal()}
+                className="btn-gold flex items-center gap-2 py-2 text-xs"
+              >
+                <Plus className="w-4 h-4" /> Add New Car
+              </button>
+              <div className="flex items-center gap-2 bg-gold-400/10 px-3 py-1.5 rounded-full">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-xs text-gold-400 font-medium">Admin Mode</span>
+              </div>
             </div>
           </div>
 
@@ -188,8 +225,8 @@ export default function Admin() {
                           <div className="flex items-center gap-3">
                             <img src={car.images[0]} alt={car.title} className="w-14 h-10 rounded-sm object-cover flex-shrink-0" />
                             <div>
-                              <p className="text-sm font-medium text-white">{car.title}</p>
-                              <p className="text-xs text-luxury-muted">{car.brand}</p>
+                                <p className="text-sm font-medium text-white">{car.title}</p>
+                                <p className="text-xs text-luxury-muted">{car.brand} • {car.fuel}</p>
                             </div>
                           </div>
                         </td>
@@ -197,30 +234,37 @@ export default function Admin() {
                         <td className="px-6 py-4 text-sm text-white">{car.year}</td>
                         <td className="px-6 py-4">
                           <span className={`px-3 py-1 text-xs rounded-full ${
-                            carStatuses[car.id] === 'approved'
+                            car.status === 'approved'
                               ? 'bg-green-500/10 text-green-400'
-                              : carStatuses[car.id] === 'rejected'
+                              : car.status === 'rejected'
                               ? 'bg-red-500/10 text-red-400'
                               : 'bg-yellow-500/10 text-yellow-400'
                           }`}>
-                            {carStatuses[car.id]}
+                            {car.status || 'pending'}
                           </span>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => handleApprove(car.id)}
+                              onClick={() => handleOpenModal(car)}
+                              className="w-8 h-8 bg-gold-400/10 rounded-sm flex items-center justify-center text-gold-400 hover:bg-gold-400/20 transition-colors"
+                              title="Edit"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => updateCarStatus(car.id, 'approved')}
                               className="w-8 h-8 bg-green-500/10 rounded-sm flex items-center justify-center text-green-400 hover:bg-green-500/20 transition-colors"
                               title="Approve"
                             >
                               <CheckCircle className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => handleReject(car.id)}
-                              className="w-8 h-8 bg-red-500/10 rounded-sm flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-colors"
-                              title="Reject"
+                                onClick={() => deleteCar(car.id)}
+                                className="w-8 h-8 bg-red-500/10 rounded-sm flex items-center justify-center text-red-400 hover:bg-red-500/20 transition-colors"
+                                title="Delete"
                             >
-                              <XCircle className="w-4 h-4" />
+                                <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
@@ -320,6 +364,163 @@ export default function Admin() {
           </motion.div>
         )}
       </div>
+
+      {/* Add/Edit Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-2xl bg-luxury-dark border border-luxury-border shadow-2xl max-h-[90vh] overflow-y-auto"
+            >
+              <div className="sticky top-0 bg-luxury-dark border-b border-luxury-border p-6 flex items-center justify-between z-10">
+                <h3 className="font-display text-xl font-bold text-white">
+                  {editingCar ? 'Edit Car Details' : 'Add New Car Listing'}
+                </h3>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-luxury-muted" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveCar} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Display Title</label>
+                    <input 
+                      type="text" 
+                      value={form.title} 
+                      onChange={(e) => setForm({...form, title: e.target.value})}
+                      className="input-luxury" 
+                      placeholder="e.g. Lamborghini Huracán EVO"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Brand</label>
+                    <select 
+                      value={form.brand} 
+                      onChange={(e) => setForm({...form, brand: e.target.value})}
+                      className="input-luxury"
+                      required
+                    >
+                      <option value="">Select Brand</option>
+                      {brands.map(b => <option key={b.name} value={b.name}>{b.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Model</label>
+                    <input 
+                      type="text" 
+                      value={form.model} 
+                      onChange={(e) => setForm({...form, model: e.target.value})}
+                      className="input-luxury" 
+                      placeholder="e.g. Huracán"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Year</label>
+                    <input 
+                      type="number" 
+                      value={form.year} 
+                      onChange={(e) => setForm({...form, year: e.target.value})}
+                      className="input-luxury" 
+                      placeholder="2024"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Price (₹)</label>
+                    <input 
+                      type="number" 
+                      value={form.price} 
+                      onChange={(e) => setForm({...form, price: e.target.value})}
+                      className="input-luxury" 
+                      placeholder="35000000"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">KM Driven</label>
+                    <input 
+                      type="number" 
+                      value={form.kmDriven} 
+                      onChange={(e) => setForm({...form, kmDriven: e.target.value})}
+                      className="input-luxury" 
+                      placeholder="1200"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Fuel Type</label>
+                    <select 
+                      value={form.fuel} 
+                      onChange={(e) => setForm({...form, fuel: e.target.value})}
+                      className="input-luxury"
+                    >
+                      <option>Petrol</option>
+                      <option>Diesel</option>
+                      <option>Electric</option>
+                      <option>Hybrid</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Description</label>
+                    <textarea 
+                        rows={4} 
+                        value={form.description} 
+                        onChange={(e) => setForm({...form, description: e.target.value})}
+                        className="input-luxury resize-none" 
+                        placeholder="Detailed description of the car..."
+                    />
+                </div>
+
+                <div>
+                    <label className="text-xs text-luxury-muted uppercase tracking-wider block mb-2">Image URL</label>
+                    <div className="flex gap-2">
+                        <input 
+                            type="text" 
+                            value={form.images[0]} 
+                            onChange={(e) => setForm({...form, images: [e.target.value]})}
+                            className="input-luxury" 
+                            placeholder="https://images.unsplash.com/..."
+                        />
+                        <div className="w-12 h-12 bg-luxury-dark border border-luxury-border rounded flex-shrink-0 overflow-hidden">
+                            {form.images[0] && <img src={form.images[0]} className="w-full h-full object-cover" alt="Preview" />}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <button 
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-6 py-2 text-sm font-medium text-luxury-muted hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-gold py-2 px-8">
+                    {editingCar ? 'Update Listing' : 'Publish Listing'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

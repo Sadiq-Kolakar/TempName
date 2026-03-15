@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Grid3x3, List, SlidersHorizontal, X, ChevronDown, Search } from 'lucide-react';
-import { cars, brands } from '../data/cars';
+import { brands } from '../data/cars';
+import { useCars } from '../context/CarContext';
 import CarCard from '../components/CarCard';
 
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric', 'Hybrid'];
@@ -10,6 +11,7 @@ const TRANSMISSIONS = ['Automatic', 'Manual'];
 const BODY_TYPES = ['Sedan', 'SUV', 'Coupe', 'Convertible', 'Hatchback'];
 
 export default function Listings() {
+  const { cars } = useCars();
   const [searchParams, setSearchParams] = useSearchParams();
   const [view, setView] = useState('grid');
   const [showFilters, setShowFilters] = useState(false);
@@ -31,6 +33,8 @@ export default function Listings() {
 
   const filteredCars = useMemo(() => {
     let result = cars.filter((car) => {
+      // Only show approved cars in listings
+      if (car.status !== 'approved') return false;
       if (filters.search) {
         const q = filters.search.toLowerCase();
         if (

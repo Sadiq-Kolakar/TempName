@@ -27,6 +27,9 @@ export default {
           border: '#2a2a2a',
           muted: '#888888',
           light: '#f5f5f5',
+          charcoal: '#171717',
+          red: '#c41010',
+          'red-dark': '#8b0808',
         }
       },
       fontFamily: {
@@ -71,6 +74,8 @@ export default {
       backgroundImage: {
         'gradient-gold': 'linear-gradient(135deg, #c9a84c 0%, #e9c96e 50%, #c9a84c 100%)',
         'gradient-dark': 'linear-gradient(180deg, #0a0a0a 0%, #141414 100%)',
+        'gradient-sport': 'linear-gradient(135deg, #c41010 0%, #171717 100%)',
+        'gradient-charcoal': 'radial-gradient(circle at top right, #c41010 0%, transparent 40%), radial-gradient(circle at bottom left, #8b0808 0%, transparent 40%), #171717',
       },
     },
   },

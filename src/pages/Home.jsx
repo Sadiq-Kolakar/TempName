@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Shield, Award, Clock, TrendingUp, Star, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { cars, brands, testimonials, formatPrice } from '../data/cars';
+import { brands, testimonials, formatPrice } from '../data/cars';
+import { useCars } from '../context/CarContext';
 import CarCard from '../components/CarCard';
 
 function Counter({ end, suffix = '', prefix = '' }) {
@@ -35,6 +36,7 @@ function Counter({ end, suffix = '', prefix = '' }) {
 }
 
 export default function Home() {
+  const { cars } = useCars();
   const [heroSlide, setHeroSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const featuredCars = cars.filter((c) => c.featured);

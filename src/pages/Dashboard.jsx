@@ -3,10 +3,12 @@ import { Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Car, MessageSquare, Calendar, Heart, Clock, Eye, Plus, ChevronRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { cars, formatPrice } from '../data/cars';
+import { formatPrice } from '../data/cars';
+import { useCars } from '../context/CarContext';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { cars } = useCars();
   const [tab, setTab] = useState('overview');
 
   if (!user) return <Navigate to="/login" />;

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, ChevronRight, ChevronLeft, Check, Car, Settings, Camera, DollarSign, Send, X } from 'lucide-react';
 import { brands } from '../data/cars';
+import { useCars } from '../context/CarContext';
 
 const STEPS = [
   { icon: Car, label: 'Car Details' },
@@ -12,6 +13,7 @@ const STEPS = [
 ];
 
 export default function SellCar() {
+  const { addCar } = useCars();
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [photos, setPhotos] = useState([]);
@@ -37,6 +39,12 @@ export default function SellCar() {
   };
 
   const handleSubmit = () => {
+    addCar({
+      ...form,
+      title: `${form.brand} ${form.model}`,
+      images: photos.map(p => p.preview),
+      status: 'pending' // User added cars are pending
+    });
     setSubmitted(true);
   };
 

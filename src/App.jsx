@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
+import { CarProvider } from './context/CarContext';
 import { CompareProvider } from './context/CompareContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -27,27 +28,29 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <CompareProvider>
-          <div className="min-h-screen bg-luxury-black font-body">
-            <ScrollToTop />
-            <Navbar />
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/listings" element={<Listings />} />
-                <Route path="/car/:id" element={<CarDetail />} />
-                <Route path="/sell" element={<SellCar />} />
-                <Route path="/compare" element={<Compare />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/admin" element={<Admin />} />
-              </Routes>
-            </main>
-            <Footer />
-            <CompareBar />
-          </div>
-        </CompareProvider>
+        <CarProvider>
+          <CompareProvider>
+            <div className="min-h-screen bg-luxury-black font-body">
+              <ScrollToTop />
+              <Navbar />
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/listings" element={<Listings />} />
+                  <Route path="/car/:id" element={<CarDetail />} />
+                  <Route path="/sell" element={<SellCar />} />
+                  <Route path="/compare" element={<Compare />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/admin" element={<Admin />} />
+                </Routes>
+              </main>
+              <Footer />
+              <CompareBar />
+            </div>
+          </CompareProvider>
+        </CarProvider>
       </AuthProvider>
     </Router>
   );

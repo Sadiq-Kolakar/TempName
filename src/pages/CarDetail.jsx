@@ -5,13 +5,15 @@ import {
   ChevronLeft, ChevronRight, MapPin, Calendar, Gauge, Fuel, GitBranch, Palette,
   Users, Zap, Settings, ArrowRight, MessageCircle, Phone, Share2, Heart, X
 } from 'lucide-react';
-import { cars, formatPrice, formatKm } from '../data/cars';
+import { formatPrice, formatKm } from '../data/cars';
+import { useCars } from '../context/CarContext';
 import EMICalculator from '../components/EMICalculator';
 import EnquiryModal from '../components/EnquiryModal';
 import CarCard from '../components/CarCard';
 
 export default function CarDetail() {
   const { id } = useParams();
+  const { cars } = useCars();
   const car = cars.find((c) => c.id === Number(id));
   const [mainImage, setMainImage] = useState(0);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
