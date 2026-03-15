@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Car, Users, MessageSquare, TrendingUp, CheckCircle, XCircle, Eye, 
@@ -12,9 +12,25 @@ import { brands, formatPrice } from '../data/cars';
 export default function Admin() {
   const { user } = useAuth();
   const { cars, addCar, updateCar, deleteCar, updateCarStatus } = useCars();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCar, setEditingCar] = useState(null);
+
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId) {
+      const carToEdit = cars.find(c => c.id === Number(editId));
+      if (carToEdit) {
+        setTab('cars');
+        handleOpenModal(carToEdit);
+      }
+      // Clear the param so it doesn't re-open
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete('edit');
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, cars]);
   
   const [form, setForm] = useState({
     title: '', brand: '', model: '', year: '', price: '',

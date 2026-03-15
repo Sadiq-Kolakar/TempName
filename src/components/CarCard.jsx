@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Fuel, Gauge, Calendar, GitBranch, Plus, Check } from 'lucide-react';
+import { Fuel, Gauge, Calendar, GitBranch, Plus, Check, Pencil } from 'lucide-react';
 import { formatPrice, formatKm } from '../data/cars';
 import { useCompare } from '../context/CompareContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function CarCard({ car, index = 0, view = 'grid' }) {
+  const { user } = useAuth();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
   const inCompare = isInCompare(car.id);
+  const isAdmin = user?.role === 'admin';
 
   if (view === 'list') {
     return (
@@ -60,6 +63,14 @@ export default function CarCard({ car, index = 0, view = 'grid' }) {
           </div>
           <div className="flex items-center gap-3 mt-4">
             <Link to={`/car/${car.id}`} className="btn-gold text-xs py-2">View Details</Link>
+            {isAdmin && (
+              <Link 
+                to={`/admin?edit=${car.id}`} 
+                className="btn-dark text-xs py-2 flex items-center gap-1 border border-gold-400/30 text-gold-400 hover:bg-gold-400/10"
+              >
+                <Pencil className="w-3 h-3" /> Edit
+              </Link>
+            )}
             <button
               onClick={() => inCompare ? removeFromCompare(car.id) : addToCompare(car)}
               className={`btn-outline text-xs py-2 flex items-center gap-1 ${inCompare ? 'bg-gold-400/10' : ''}`}
@@ -112,6 +123,16 @@ export default function CarCard({ car, index = 0, view = 'grid' }) {
             {formatPrice(car.price)}
           </p>
         </div>
+        {isAdmin && (
+          <Link
+            to={`/admin?edit=${car.id}`}
+            className="absolute bottom-3 right-3 w-8 h-8 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-gold-400 hover:bg-gold-400 hover:text-luxury-black transition-all"
+            title="Edit Car"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Pencil className="w-4 h-4" />
+          </Link>
+        )}
       </div>
       <Link to={`/car/${car.id}`} className="block p-4">
         <p className="text-[10px] text-gold-400 font-medium tracking-wider uppercase mb-1">{car.brand}</p>

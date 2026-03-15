@@ -5,6 +5,7 @@ import { Car, MessageSquare, Calendar, Heart, Clock, Eye, Plus, ChevronRight } f
 import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../data/cars';
 import { useCars } from '../context/CarContext';
+import CarCard from '../components/CarCard';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -141,17 +142,11 @@ export default function Dashboard() {
               <h3 className="font-display text-lg font-bold text-white">My Listings</h3>
               <Link to="/sell" className="btn-gold text-xs py-2">+ Add New</Link>
             </div>
-            {myListings.map((car) => (
-              <div key={car.id} className="card-luxury p-4 flex items-center gap-4">
-                <img src={car.images[0]} alt={car.title} className="w-20 h-16 rounded-sm object-cover flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-white truncate">{car.title}</h4>
-                  <p className="text-sm text-gold-400">{formatPrice(car.price)}</p>
-                </div>
-                <span className="px-3 py-1 bg-green-500/10 text-green-400 text-xs rounded-full">Active</span>
-                <Link to={`/car/${car.id}`} className="text-sm text-gold-400 hover:text-gold-300">View</Link>
-              </div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {myListings.map((car, i) => (
+                <CarCard key={car.id} car={car} index={i} />
+              ))}
+            </div>
           </motion.div>
         )}
 
@@ -209,17 +204,9 @@ export default function Dashboard() {
         {tab === 'saved' && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h3 className="font-display text-lg font-bold text-white">Saved Cars</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {cars.slice(0, 6).map((car) => (
-                <div key={car.id} className="card-luxury p-4">
-                  <img src={car.images[0]} alt={car.title} className="w-full h-40 rounded-sm object-cover mb-3" />
-                  <p className="text-xs text-gold-400 uppercase tracking-wider">{car.brand}</p>
-                  <h4 className="font-display font-bold text-white">{car.title}</h4>
-                  <p className="font-display text-lg font-bold gold-gradient-text mt-1">{formatPrice(car.price)}</p>
-                  <Link to={`/car/${car.id}`} className="btn-outline text-xs w-full mt-3 text-center block">
-                    View Details
-                  </Link>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {cars.slice(0, 6).map((car, i) => (
+                <CarCard key={car.id} car={car} index={i} />
               ))}
             </div>
           </motion.div>
