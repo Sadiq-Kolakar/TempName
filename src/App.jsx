@@ -30,7 +30,7 @@ function App() {
       <AuthProvider>
         <CarProvider>
           <CompareProvider>
-            <div className="min-h-screen bg-luxury-black font-body">
+            <div className="min-h-screen font-body">
               <ScrollToTop />
               <Navbar />
               <main>

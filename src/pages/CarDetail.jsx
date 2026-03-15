@@ -51,7 +51,7 @@ export default function CarDetail() {
   const whatsappLink = `https://wa.me/919876543210?text=Hi! I'm interested in the ${car.title} (${car.year}) listed at ${formatPrice(car.price)}. Please share more details.`;
 
   return (
-    <div className="pt-20 min-h-screen bg-luxury-black">
+    <div className="pt-20 min-h-screen">
       {/* Breadcrumb */}
       <div className="bg-luxury-dark border-b border-luxury-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
